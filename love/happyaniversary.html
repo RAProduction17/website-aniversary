@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Anniversary, Sayang! 💕</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts: Great Vibes, Playfair Display, & Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:ital,wght@0,500;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        script: ['"Great Vibes"', 'cursive'],
+                        serif: ['"Playfair Display"', 'serif'],
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                    colors: {
+                        roseBlush: '#FFF5F7',
+                        pinkSoft: '#FFE4EC',
+                        pinkPastel: '#FFB3C6',
+                        pinkVibrant: '#FF6B9D',
+                        roseDeep: '#E11D48',
+                    },
+                    animation: {
+                        'float-slow': 'float 6s ease-in-out infinite',
+                        'pulse-soft': 'pulseSoft 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'spin-slow': 'spin 12s linear infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-12px)' },
+                        },
+                        pulseSoft: {
+                            '0%, 100%': { transform: 'scale(1)' },
+                            '50%': { transform: 'scale(1.05)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #FFF5F7;
+            color: #4A1525;
+            overflow-x: hidden;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 179, 198, 0.5);
+            box-shadow: 0 10px 35px -5px rgba(255, 107, 157, 0.15);
+        }
+
+        .envelope-wrapper {
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        .envelope-wrapper:hover {
+            transform: translateY(-4px);
+        }
+        .envelope-flap {
+            transform-origin: top;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), z-index 0.2s;
+            z-index: 30;
+        }
+        .envelope-wrapper.open .envelope-flap {
+            transform: rotateX(180deg);
+            z-index: 5;
+        }
+        .letter-paper {
+            transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.5s ease;
+            z-index: 10;
+        }
+        .envelope-wrapper.open .letter-paper {
+            transform: translateY(-45px);
+            z-index: 25;
+        }
+
+        .typing-cursor::after {
+            content: '|';
+            animation: blink 1s step-start infinite;
+            color: #E11D48;
+        }
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #FFF5F7;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #FFB3C6;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #FF6B9D;
+        }
+
+        @keyframes eqBounce {
+            0%, 100% { transform: scaleY(0.25); }
+            50% { transform: scaleY(1); }
+        }
+        .eq-bar {
+            transform-origin: bottom;
+            animation: eqBounce 0.9s ease-in-out infinite;
+        }
+        .eq-paused .eq-bar {
+            animation-play-state: paused;
+            transform: scaleY(0.25);
+        }
+    </style>
+</head>
+<body class="font-sans antialiased selection:bg-pinkPastel selection:text-roseDeep relative">
+
+    <!-- Hidden Audio Element: Westlife - My Love -->
+    <audio id="myLoveAudio" preload="none" loop crossorigin="anonymous"
+        src="https://archive.org/download/HaloHaloMusikahan/Westlife-MyLove.mp3"></audio>
+
+    <!-- Background Floating Petals & Hearts Canvas -->
+    <canvas id="floatingCanvas" class="fixed inset-0 pointer-events-none z-0 w-full h-full"></canvas>
+
+    <!-- Confetti Burst Canvas -->
+    <canvas id="confettiCanvas" class="fixed inset-0 pointer-events-none z-50 w-full h-full"></canvas>
+
+    <!-- Floating Top Music Control Only -->
+    <div class="fixed top-4 right-4 z-40 flex items-center gap-2">
+        <button id="musicToggleBtn" onclick="toggleRomanticMusic()"
+            class="glass-card flex items-center gap-2 px-4 py-2.5 rounded-full text-roseDeep hover:bg-white transition-all shadow-md active:scale-95 cursor-pointer"
+            title="Putar / Jeda My Love - Westlife">
+            <i data-lucide="music" class="w-4 h-4 text-pinkVibrant"></i>
+            <span id="musicStatusText" class="text-xs font-semibold">Putar My Love</span>
+        </button>
+    </div>
+
+    <!-- Custom Toast Notification -->
+    <div id="toastNotification" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 transform translate-y-24 opacity-0 transition-all duration-300 pointer-events-none">
+        <div class="bg-roseDeep text-white px-5 py-3 rounded-full shadow-xl flex items-center gap-2 text-sm font-medium">
+            <i data-lucide="heart" class="w-4 h-4 fill-white"></i>
+            <span id="toastMessage">Memutar My Love — Westlife</span>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- 1. HERO SECTION                                                       -->
+    <!-- ===================================================================== -->
+    <header class="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 text-center pt-12 pb-16">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 border border-pinkPastel shadow-sm mb-6 animate-float-slow">
+            <span class="w-2 h-2 rounded-full bg-roseDeep animate-ping"></span>
+            <span class="text-xs sm:text-sm font-semibold tracking-wider uppercase text-pinkVibrant">Since 25 April 2026</span>
+        </div>
+
+        <p class="font-script text-3xl sm:text-5xl text-pinkVibrant mb-2 drop-shadow-sm">
+            Happy Anniversary,
+        </p>
+
+        <h1 class="font-serif text-4xl sm:text-6xl md:text-7xl font-bold text-roseDeep tracking-tight leading-tight mb-4">
+            Sayangku <span class="inline-block animate-pulse-soft">💕</span>
+        </h1>
+
+        <p class="text-sm sm:text-lg text-rose-900/80 max-w-xl mx-auto leading-relaxed mb-8 font-normal">
+            Terima kasih sudah hadir, bertahan, dan menjadikan setiap hari sejak <span class="font-semibold text-roseDeep">25 April 2026</span> terasa jauh lebih indah bersamaku. Ini kejutan kecil untuk merayakan kisah kita.
+        </p>
+
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4 w-full max-w-md mx-auto">
+            <button onclick="startSurpriseJourney()"
+                class="w-full sm:w-auto px-8 py-4 rounded-full bg-gradient-to-r from-pinkVibrant to-roseDeep text-white font-semibold text-sm sm:text-base shadow-lg shadow-pinkVibrant/30 hover:shadow-xl hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer">
+                <i data-lucide="sparkles" class="w-5 h-5"></i>
+                <span>Buka Kejutan Kita</span>
+            </button>
+
+            <button onclick="toggleRomanticMusic()"
+                class="w-full sm:w-auto px-6 py-4 rounded-full bg-white text-roseDeep border border-pinkPastel font-semibold text-sm sm:text-base hover:bg-pinkSoft/50 transition-all duration-300 flex items-center justify-center gap-2 shadow-sm cursor-pointer">
+                <i data-lucide="volume-2" class="w-5 h-5 text-pinkVibrant"></i>
+                <span id="heroMusicBtnText">Putar My Love</span>
+            </button>
+        </div>
+
+        <a href="#timer-section" class="absolute bottom-8 left-1/2 -translate-x-1/2 text-pinkVibrant/80 hover:text-roseDeep transition-colors animate-bounce p-2">
+            <i data-lucide="chevron-down" class="w-7 h-7"></i>
+        </a>
+    </header>
+
+    <!-- ===================================================================== -->
+    <!-- 2. LIVE RELATIONSHIP TIMER (FIXED: 25 APRIL 2026)                     -->
+    <!-- ===================================================================== -->
+    <section id="timer-section" class="relative z-10 py-16 sm:py-24 px-4 sm:px-6 max-w-5xl mx-auto">
+        <div class="glass-card rounded-3xl p-6 sm:p-12 text-center relative overflow-hidden">
+            <div class="absolute -top-12 -right-12 w-40 h-40 bg-pinkPastel/30 rounded-full blur-2xl pointer-events-none"></div>
+            <div class="absolute -bottom-12 -left-12 w-40 h-40 bg-pinkVibrant/20 rounded-full blur-2xl pointer-events-none"></div>
+
+            <span class="text-xs font-bold uppercase tracking-widest text-pinkVibrant">Waktu Kebersamaan Kita</span>
+            <h2 class="font-serif text-2xl sm:text-4xl font-bold text-roseDeep mt-2 mb-2">
+                Setiap Detik Berharga Bersamamu
+            </h2>
+            <p class="text-xs sm:text-sm text-rose-800/70 mb-8">
+                Resmi jadian sejak <span class="font-semibold text-roseDeep underline decoration-pinkPastel decoration-2 underline-offset-4">25 April 2026</span>
+            </p>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-6 max-w-3xl mx-auto">
+                <div class="bg-white rounded-2xl p-4 sm:p-6 border border-pinkSoft shadow-sm hover:border-pinkVibrant transition-colors">
+                    <div id="timerDays" class="font-serif text-3xl sm:text-5xl font-bold text-roseDeep">0</div>
+                    <div class="text-xs sm:text-sm font-medium text-pinkVibrant uppercase tracking-wider mt-1">Hari</div>
+                </div>
+                <div class="bg-white rounded-2xl p-4 sm:p-6 border border-pinkSoft shadow-sm hover:border-pinkVibrant transition-colors">
+                    <div id="timerHours" class="font-serif text-3xl sm:text-5xl font-bold text-roseDeep">00</div>
+                    <div class="text-xs sm:text-sm font-medium text-pinkVibrant uppercase tracking-wider mt-1">Jam</div>
+                </div>
+                <div class="bg-white rounded-2xl p-4 sm:p-6 border border-pinkSoft shadow-sm hover:border-pinkVibrant transition-colors">
+                    <div id="timerMinutes" class="font-serif text-3xl sm:text-5xl font-bold text-roseDeep">00</div>
+                    <div class="text-xs sm:text-sm font-medium text-pinkVibrant uppercase tracking-wider mt-1">Menit</div>
+                </div>
+                <div class="bg-white rounded-2xl p-4 sm:p-6 border border-pinkSoft shadow-sm hover:border-pinkVibrant transition-colors">
+                    <div id="timerSeconds" class="font-serif text-3xl sm:text-5xl font-bold text-pinkVibrant">00</div>
+                    <div class="text-xs sm:text-sm font-medium text-roseDeep uppercase tracking-wider mt-1">Detik</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- 2B. AUDIO PLAYER: MY LOVE - WESTLIFE                                  -->
+    <!-- ===================================================================== -->
+    <section id="music-player-section" class="relative z-10 py-8 sm:py-12 px-4 sm:px-6 max-w-4xl mx-auto">
+        <div class="glass-card rounded-3xl p-5 sm:p-7 border border-pinkPastel/80 relative overflow-hidden">
+            <div class="flex flex-col sm:flex-row items-center gap-5 sm:gap-6">
+                <div class="relative shrink-0">
+                    <div id="vinylDisc" class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-tr from-roseDeep via-pinkVibrant to-pinkPastel p-1.5 shadow-lg animate-spin-slow" style="animation-play-state: paused;">
+                        <div class="w-full h-full rounded-full bg-white flex flex-col items-center justify-center border-2 border-pinkSoft relative">
+                            <div class="w-3 h-3 rounded-full bg-roseBlush border border-pinkVibrant/40 mb-0.5"></div>
+                            <span class="text-[9px] font-bold uppercase tracking-wider text-roseDeep">My Love</span>
+                        </div>
+                    </div>
+                    <div class="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-white border border-pinkPastel shadow flex items-center justify-center text-roseDeep">
+                        <i data-lucide="disc-3" class="w-4 h-4 text-pinkVibrant"></i>
+                    </div>
+                </div>
+
+                <div class="flex-1 w-full text-center sm:text-left">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-1">
+                        <div>
+                            <span class="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-pinkVibrant">
+                                <i data-lucide="music-2" class="w-3.5 h-3.5"></i>
+                                Soundtrack Kita • Sejak 25 April 2026
+                            </span>
+                            <h3 class="font-serif text-xl sm:text-2xl font-bold text-roseDeep">
+                                My Love <span class="font-sans text-sm sm:text-base font-normal text-rose-800/75">— Westlife</span>
+                            </h3>
+                        </div>
+
+                        <div id="equalizerBox" class="eq-paused flex items-end justify-center sm:justify-end gap-1 h-6 px-2.5 py-1 rounded-full bg-pinkSoft/70 border border-pinkPastel/60 self-center sm:self-auto">
+                            <span class="eq-bar w-1 h-4 bg-roseDeep rounded-full" style="animation-delay: 0s;"></span>
+                            <span class="eq-bar w-1 h-5 bg-pinkVibrant rounded-full" style="animation-delay: 0.15s;"></span>
+                            <span class="eq-bar w-1 h-3 bg-roseDeep rounded-full" style="animation-delay: 0.3s;"></span>
+                            <span class="eq-bar w-1 h-5 bg-pinkVibrant rounded-full" style="animation-delay: 0.45s;"></span>
+                            <span class="eq-bar w-1 h-4 bg-roseDeep rounded-full" style="animation-delay: 0.6s;"></span>
+                        </div>
+                    </div>
+
+                    <p id="activeLyricDisplay" class="font-serif italic text-sm sm:text-base text-rose-900/85 my-2.5 min-h-[24px] transition-all">
+                        "So I say a little prayer for you..."
+                    </p>
+
+                    <div class="flex items-center gap-3 text-xs font-medium text-rose-800/75 mb-3">
+                        <span id="currentTimeLabel" class="w-10 text-left">0:00</span>
+                        <input id="audioProgressBar" type="range" min="0" max="100" value="0" step="0.1"
+                            oninput="seekMusicProgress(this.value)"
+                            class="flex-1 h-2 bg-pinkSoft rounded-lg appearance-none cursor-pointer accent-roseDeep">
+                        <span id="durationTimeLabel" class="w-10 text-right">3:52</span>
+                    </div>
+
+                    <div class="flex flex-wrap items-center justify-center sm:justify-between gap-2">
+                        <button id="playerPlayPauseBtn" onclick="toggleRomanticMusic()"
+                            class="px-5 py-2 rounded-full bg-gradient-to-r from-pinkVibrant to-roseDeep text-white text-xs sm:text-sm font-semibold shadow-md hover:shadow-lg active:scale-95 transition-all flex items-center gap-2 cursor-pointer">
+                            <i id="playerPlayIcon" data-lucide="play" class="w-4 h-4 fill-white"></i>
+                            <span id="playerPlayLabel">Putar My Love</span>
+                        </button>
+                        <span id="audioSourceBadge" class="text-[11px] text-rose-800/65 bg-white/80 px-3 py-1 rounded-full border border-pinkSoft">
+                            Westlife - My Love (Internet Archive)
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- 3. TIMELINE PERJALANAN CINTA                                          -->
+    <!-- ===================================================================== -->
+    <section id="timeline-section" class="relative z-10 py-16 sm:py-24 px-4 sm:px-6 max-w-5xl mx-auto">
+        <div class="text-center mb-12 sm:mb-16">
+            <span class="text-xs font-bold uppercase tracking-widest text-pinkVibrant">Our Love Story</span>
+            <h2 class="font-serif text-3xl sm:text-4xl font-bold text-roseDeep mt-2">
+                Jejak Langkah Kisah Kita
+            </h2>
+            <p class="text-sm text-rose-900/75 mt-2 max-w-md mx-auto">
+                Dari pertemuan sederhana hingga menjadi rumah paling nyaman untuk pulang.
+            </p>
+        </div>
+
+        <div class="relative">
+            <div class="hidden md:block absolute left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-gradient-to-b from-pinkPastel via-pinkVibrant to-roseDeep rounded-full"></div>
+
+            <div class="space-y-8 md:space-y-12">
+                <div class="relative flex flex-col md:flex-row items-center justify-between">
+                    <div class="w-full md:w-5/12 glass-card rounded-3xl p-6 hover:-translate-y-1 transition-transform duration-300">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="px-3 py-1 rounded-full bg-pinkSoft text-roseDeep text-xs font-bold">Chapter 01</span>
+                            <i data-lucide="sparkles" class="w-5 h-5 text-pinkVibrant"></i>
+                        </div>
+                        <h3 class="font-serif text-xl font-bold text-roseDeep mb-2">Pertama Kali Bertemu</h3>
+                        <p class="text-sm text-rose-900/80 leading-relaxed">
+                            Momen di mana semesta mempertemukan kita tanpa sengaja. Siapa sangka sapaan singkat waktu itu menjadi awal dari segalanya.
+                        </p>
+                    </div>
+                    <div class="hidden md:flex items-center justify-center w-10 h-10 rounded-full bg-white border-4 border-pinkVibrant text-roseDeep shadow-md z-10">
+                        <i data-lucide="heart" class="w-4 h-4 fill-roseDeep"></i>
+                    </div>
+                    <div class="hidden md:block w-5/12"></div>
+                </div>
+
+                <div class="relative flex flex-col md:flex-row items-center justify-between">
+                    <div class="hidden md:block w-5/12"></div>
+                    <div class="hidden md:flex items-center justify-center w-10 h-10 rounded-full bg-white border-4 border-pinkVibrant text-roseDeep shadow-md z-10">
+                        <i data-lucide="coffee" class="w-4 h-4 text-roseDeep"></i>
+                    </div>
+                    <div class="w-full md:w-5/12 glass-card rounded-3xl p-6 hover:-translate-y-1 transition-transform duration-300">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="px-3 py-1 rounded-full bg-pinkSoft text-roseDeep text-xs font-bold">Chapter 02</span>
+                            <i data-lucide="smile" class="w-5 h-5 text-pinkVibrant"></i>
+                        </div>
+                        <h3 class="font-serif text-xl font-bold text-roseDeep mb-2">Kencan Pertama & Obrolan Panjang</h3>
+                        <p class="text-sm text-rose-900/80 leading-relaxed">
+                            Grogi tapi bahagia. Waktu terasa berjalan begitu cepat setiap kali kita bercerita dan tertawa bersama.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="relative flex flex-col md:flex-row items-center justify-between">
+                    <div class="w-full md:w-5/12 glass-card rounded-3xl p-6 hover:-translate-y-1 transition-transform duration-300">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="px-3 py-1 rounded-full bg-pinkSoft text-roseDeep text-xs font-bold">25 April 2026</span>
+                            <i data-lucide="heart-handshake" class="w-5 h-5 text-pinkVibrant"></i>
+                        </div>
+                        <h3 class="font-serif text-xl font-bold text-roseDeep mb-2">Resmi Menjadi Kita</h3>
+                        <p class="text-sm text-rose-900/80 leading-relaxed">
+                            Hari terbaik di mana kita sepakat untuk berjalan beriringan, saling menjaga hati, dan tumbuh bersama dalam suka maupun duka.
+                        </p>
+                    </div>
+                    <div class="hidden md:flex items-center justify-center w-10 h-10 rounded-full bg-white border-4 border-pinkVibrant text-roseDeep shadow-md z-10">
+                        <i data-lucide="star" class="w-4 h-4 fill-roseDeep"></i>
+                    </div>
+                    <div class="hidden md:block w-5/12"></div>
+                </div>
+
+                <div class="relative flex flex-col md:flex-row items-center justify-between">
+                    <div class="hidden md:block w-5/12"></div>
+                    <div class="hidden md:flex items-center justify-center w-10 h-10 rounded-full bg-roseDeep border-4 border-pinkPastel text-white shadow-md z-10">
+                        <i data-lucide="crown" class="w-4 h-4"></i>
+                    </div>
+                    <div class="w-full md:w-5/12 bg-gradient-to-br from-white to-pinkSoft/90 border border-pinkVibrant/40 shadow-lg rounded-3xl p-6 hover:-translate-y-1 transition-transform duration-300">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="px-3 py-1 rounded-full bg-roseDeep text-white text-xs font-bold">Today • Anniversary</span>
+                            <i data-lucide="infinity" class="w-5 h-5 text-roseDeep"></i>
+                        </div>
+                        <h3 class="font-serif text-xl font-bold text-roseDeep mb-2">Merayakan Hari Spesial Ini</h3>
+                        <p class="text-sm text-rose-900/85 leading-relaxed">
+                            Terima kasih sudah menjadi pasangan paling luar biasa. Semoga halaman-halaman berikutnya selalu diisi dengan cinta yang semakin kuat.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- 3B. GALERI MOMEN MANIS                                                -->
+    <!-- ===================================================================== -->
+    <section id="gallery-section" class="relative z-10 py-16 sm:py-24 px-4 sm:px-6 max-w-6xl mx-auto">
+        <div class="text-center mb-12">
+            <span class="text-xs font-bold uppercase tracking-widest text-pinkVibrant">Sweet Memories</span>
+            <h2 class="font-serif text-3xl sm:text-4xl font-bold text-roseDeep mt-2">
+                Galeri Momen Manis Kita
+            </h2>
+            <p class="text-sm text-rose-900/75 mt-2 max-w-md mx-auto">
+                Potongan kenangan favorit yang selalu bikin senyum-senyum sendiri saat diingat kembali.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="glass-card rounded-3xl overflow-hidden group hover:-translate-y-1.5 transition-all duration-300">
+                <div class="aspect-[4/3] overflow-hidden bg-pinkSoft">
+                    <img src="1.jpeg"
+                        onerror="this.src='https://placehold.co/600x450/FFF5F7/FF6B9D?text=Sweet+Moment+1'"
+                        alt="Momen spesial 25 April 2026" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                </div>
+                <div class="p-5">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-pinkVibrant">Momen #01</span>
+                    <h3 class="font-serif text-lg font-bold text-roseDeep mt-1">Senyum Pertama di Hari Itu</h3>
+                    <p class="text-xs sm:text-sm text-rose-900/75 mt-1.5 leading-relaxed">
+                        Detik-detik canggung yang perlahan berubah jadi hangat dan penuh tawa.
+                    </p>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-3xl overflow-hidden group hover:-translate-y-1.5 transition-all duration-300">
+                <div class="aspect-[4/3] overflow-hidden bg-pinkSoft">
+                    <img src="4.jpeg"
+                        onerror="this.src='https://placehold.co/600x450/FFF5F7/FF6B9D?text=Sweet+Moment+2'"
+                        alt="Jalan sore bersama" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                </div>
+                <div class="p-5">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-pinkVibrant">Momen #02</span>
+                    <h3 class="font-serif text-lg font-bold text-roseDeep mt-1">Jalan Sore & Obrolan Tanpa Batas</h3>
+                    <p class="text-xs sm:text-sm text-rose-900/75 mt-1.5 leading-relaxed">
+                        Langit senja dan langkah kaki kita yang selalu terasa pas satu sama lain.
+                    </p>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-3xl overflow-hidden group hover:-translate-y-1.5 transition-all duration-300 sm:col-span-2 lg:col-span-1">
+                <div class="aspect-[4/3] overflow-hidden bg-pinkSoft">
+                    <img src="3.jpeg"
+                        onerror="this.src='https://placehold.co/600x450/FFE4EC/E11D48?text=Sweet+Moment+3'"
+                        alt="Momen favorit selamanya" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                </div>
+                <div class="p-5">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-pinkVibrant">Momen #03</span>
+                    <h3 class="font-serif text-lg font-bold text-roseDeep mt-1">Setiap Hari Bersamamu</h3>
+                    <p class="text-xs sm:text-sm text-rose-900/75 mt-1.5 leading-relaxed">
+                        Bukan sekadar tempat tujuan, tapi siapa yang berjalan di sampingku sepanjang jalan.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- 4. INTERACTIVE LOVE LETTER ENVELOPE                                   -->
+    <!-- ===================================================================== -->
+    <section id="letter-section" class="relative z-10 py-16 sm:py-24 px-4 sm:px-6 max-w-4xl mx-auto">
+        <div class="text-center mb-10">
+            <span class="text-xs font-bold uppercase tracking-widest text-pinkVibrant">Pesan Dari Hati</span>
+            <h2 class="font-serif text-3xl sm:text-4xl font-bold text-roseDeep mt-2">
+                Surat Kecil Untukmu
+            </h2>
+            <p class="text-sm text-rose-900/75 mt-2">
+                Ketuk amplop di bawah ini untuk membuka suratnya 💌
+            </p>
+        </div>
+
+        <div class="flex flex-col items-center justify-center">
+            <div id="envelopeBox" onclick="toggleEnvelope()" class="envelope-wrapper w-full max-w-md mx-auto pt-12 select-none">
+                <div class="relative w-full h-60 sm:h-64 bg-gradient-to-b from-pinkPastel to-pinkVibrant rounded-b-3xl shadow-xl flex items-end justify-center p-4">
+                    <div id="envelopeFlap" class="envelope-flap absolute top-0 left-0 w-full h-36 bg-pinkVibrant rounded-t-2xl shadow-md" style="clip-path: polygon(0 0, 100% 0, 50% 100%);"></div>
+
+                    <div id="letterPaper" class="letter-paper w-[92%] bg-white rounded-2xl p-6 shadow-lg border border-pinkSoft text-center opacity-95">
+                        <p class="font-script text-2xl text-roseDeep mb-1">Untuk Sayangku,</p>
+                        <p class="text-xs text-rose-800/70">Ketuk lagi untuk membaca surat lengkap di bawah...</p>
+                    </div>
+
+                    <div class="absolute inset-0 bg-gradient-to-tr from-roseDeep/90 via-pinkVibrant to-pinkPastel rounded-b-3xl pointer-events-none z-20 flex items-center justify-center" style="clip-path: polygon(0 25%, 50% 65%, 100% 25%, 100% 100%, 0 100%);">
+                        <div class="mt-16 w-11 h-11 rounded-full bg-white text-roseDeep shadow-lg flex items-center justify-center border-2 border-pinkSoft">
+                            <i data-lucide="heart" class="w-5 h-5 fill-roseDeep"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="fullLetterCard" class="hidden w-full max-w-2xl mt-10 glass-card rounded-3xl p-6 sm:p-10 border border-pinkVibrant/40">
+                <div class="flex items-center justify-between border-b border-pinkSoft pb-4 mb-6">
+                    <span class="font-script text-3xl text-roseDeep">Surat Cinta Untukmu</span>
+                    <button onclick="toggleEnvelope()" class="text-xs font-semibold text-pinkVibrant hover:text-roseDeep flex items-center gap-1 cursor-pointer">
+                        <i data-lucide="x" class="w-4 h-4"></i> Tutup Amplop
+                    </button>
+                </div>
+                <div id="typewriterText" class="font-serif text-base sm:text-lg text-rose-950/90 leading-relaxed whitespace-pre-line min-h-[160px]"></div>
+                <div class="mt-8 pt-4 border-t border-pinkSoft text-right">
+                    <p class="text-xs uppercase tracking-wider text-pinkVibrant font-semibold">Dengan sepenuh hati,</p>
+                    <p class="font-script text-3xl text-roseDeep mt-1">Aku</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- 5. ALASAN AKU SAYANG KAMU (FLIP CARDS)                                -->
+    <!-- ===================================================================== -->
+    <section id="reasons-section" class="relative z-10 py-16 sm:py-24 px-4 sm:px-6 max-w-6xl mx-auto">
+        <div class="text-center mb-12">
+            <span class="text-xs font-bold uppercase tracking-widest text-pinkVibrant">Little Things I Adore</span>
+            <h2 class="font-serif text-3xl sm:text-4xl font-bold text-roseDeep mt-2">
+                Alasan Aku Sayang Kamu
+            </h2>
+            <p class="text-sm text-rose-900/75 mt-2">
+                Ketuk setiap kartu untuk melihat alasannya ✨
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div onclick="this.classList.toggle('flipped')" class="flip-card perspective-1000 h-56 cursor-pointer group">
+                <div class="transform-style-3d relative w-full h-full">
+                    <div class="backface-hidden glass-card rounded-3xl p-6 flex flex-col items-center justify-center text-center h-full border-2 border-transparent group-hover:border-pinkPastel">
+                        <div class="w-12 h-12 rounded-2xl bg-pinkSoft text-roseDeep flex items-center justify-center mb-4">
+                            <i data-lucide="smile-heart" class="w-6 h-6"></i>
+                        </div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-pinkVibrant">Alasan #01</span>
+                        <h3 class="font-serif text-xl font-bold text-roseDeep mt-1">Senyumanmu</h3>
+                        <p class="text-xs text-rose-800/60 mt-3">Ketuk untuk membuka</p>
+                    </div>
+                    <div class="backface-hidden rotate-y-180 bg-gradient-to-br from-pinkVibrant to-roseDeep text-white rounded-3xl p-6 flex flex-col items-center justify-center text-center h-full shadow-lg">
+                        <i data-lucide="heart" class="w-6 h-6 fill-white mb-3"></i>
+                        <p class="text-sm sm:text-base font-medium leading-relaxed">
+                            Senyummu selalu punya cara paling ampuh buat mencairkan rasa lelahku setelah seharian beraktivitas.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div onclick="this.classList.toggle('flipped')" class="flip-card perspective-1000 h-56 cursor-pointer group">
+                <div class="transform-style-3d relative w-full h-full">
+                    <div class="backface-hidden glass-card rounded-3xl p-6 flex flex-col items-center justify-center text-center h-full border-2 border-transparent group-hover:border-pinkPastel">
+                        <div class="w-12 h-12 rounded-2xl bg-pinkSoft text-roseDeep flex items-center justify-center mb-4">
+                            <i data-lucide="ear" class="w-6 h-6"></i>
+                        </div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-pinkVibrant">Alasan #02</span>
+                        <h3 class="font-serif text-xl font-bold text-roseDeep mt-1">Pendengar Terbaik</h3>
+                        <p class="text-xs text-rose-800/60 mt-3">Ketuk untuk membuka</p>
+                    </div>
+                    <div class="backface-hidden rotate-y-180 bg-gradient-to-br from-pinkVibrant to-roseDeep text-white rounded-3xl p-6 flex flex-col items-center justify-center text-center h-full shadow-lg">
+                        <i data-lucide="heart" class="w-6 h-6 fill-white mb-3"></i>
+                        <p class="text-sm sm:text-base font-medium leading-relaxed">
+                            Kamu selalu sabar mendengarkan cerita random, keluh kesah, sampai hal-hal kecil yang terjadi di hariku.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div onclick="this.classList.toggle('flipped')" class="flip-card perspective-1000 h-56 cursor-pointer group">
+                <div class="transform-style-3d relative w-full h-full">
+                    <div class="backface-hidden glass-card rounded-3xl p-6 flex flex-col items-center justify-center text-center h-full border-2 border-transparent group-hover:border-pinkPastel">
+                        <div class="w-12 h-12 rounded-2xl bg-pinkSoft text-roseDeep flex items-center justify-center mb-4">
+                            <i data-lucide="shield-heart" class="w-6 h-6"></i>
+                        </div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-pinkVibrant">Alasan #03</span>
+                        <h3 class="font-serif text-xl font-bold text-roseDeep mt-1">Ketulusan Hatimu</h3>
+                        <p class="text-xs text-rose-800/60 mt-3">Ketuk untuk membuka</p>
+                    </div>
+                    <div class="backface-hidden rotate-y-180 bg-gradient-to-br from-pinkVibrant to-roseDeep text-white rounded-3xl p-6 flex flex-col items-center justify-center text-center h-full shadow-lg">
+                        <i data-lucide="heart" class="w-6 h-6 fill-white mb-3"></i>
+                        <p class="text-sm sm:text-base font-medium leading-relaxed">
+                            Cara kamu peduli dan menyayangi terasa begitu tulus, bikin aku merasa berharga setiap waktu.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div onclick="this.classList.toggle('flipped')" class="flip-card perspective-1000 h-56 cursor-pointer group">
+                <div class="transform-style-3d relative w-full h-full">
+                    <div class="backface-hidden glass-card rounded-3xl p-6 flex flex-col items-center justify-center text-center h-full border-2 border-transparent group-hover:border-pinkPastel">
+                        <div class="w-12 h-12 rounded-2xl bg-pinkSoft text-roseDeep flex items-center justify-center mb-4">
+                            <i data-lucide="sparkles" class="w-6 h-6"></i>
+                        </div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-pinkVibrant">Alasan #04</span>
+                        <h3 class="font-serif text-xl font-bold text-roseDeep mt-1">Tawa Bersamamu</h3>
+                        <p class="text-xs text-rose-800/60 mt-3">Ketuk untuk membuka</p>
+                    </div>
+                    <div class="backface-hidden rotate-y-180 bg-gradient-to-br from-pinkVibrant to-roseDeep text-white rounded-3xl p-6 flex flex-col items-center justify-center text-center h-full shadow-lg">
+                        <i data-lucide="heart" class="w-6 h-6 fill-white mb-3"></i>
+                        <p class="text-sm sm:text-base font-medium leading-relaxed">
+                            Hal paling sederhana sekalipun bisa jadi lucu dan berkesan kalau dijalani bareng kamu.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div onclick="this.classList.toggle('flipped')" class="flip-card perspective-1000 h-56 cursor-pointer group">
+                <div class="transform-style-3d relative w-full h-full">
+                    <div class="backface-hidden glass-card rounded-3xl p-6 flex flex-col items-center justify-center text-center h-full border-2 border-transparent group-hover:border-pinkPastel">
+                        <div class="w-12 h-12 rounded-2xl bg-pinkSoft text-roseDeep flex items-center justify-center mb-4">
+                            <i data-lucide="home" class="w-6 h-6"></i>
+                        </div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-pinkVibrant">Alasan #05</span>
+                        <h3 class="font-serif text-xl font-bold text-roseDeep mt-1">Rumah Untuk Pulang</h3>
+                        <p class="text-xs text-rose-800/60 mt-3">Ketuk untuk membuka</p>
+                    </div>
+                    <div class="backface-hidden rotate-y-180 bg-gradient-to-br from-pinkVibrant to-roseDeep text-white rounded-3xl p-6 flex flex-col items-center justify-center text-center h-full shadow-lg">
+                        <i data-lucide="heart" class="w-6 h-6 fill-white mb-3"></i>
+                        <p class="text-sm sm:text-base font-medium leading-relaxed">
+                            Ke mana pun langkah pergi, cerita tentang kamu selalu jadi tempat ternyaman untuk kembali.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div onclick="this.classList.toggle('flipped')" class="flip-card perspective-1000 h-56 cursor-pointer group">
+                <div class="transform-style-3d relative w-full h-full">
+                    <div class="backface-hidden glass-card rounded-3xl p-6 flex flex-col items-center justify-center text-center h-full border-2 border-transparent group-hover:border-pinkPastel">
+                        <div class="w-12 h-12 rounded-2xl bg-pinkSoft text-roseDeep flex items-center justify-center mb-4">
+                            <i data-lucide="infinity" class="w-6 h-6"></i>
+                        </div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-pinkVibrant">Alasan #06</span>
+                        <h3 class="font-serif text-xl font-bold text-roseDeep mt-1">Bertahan Bersama</h3>
+                        <p class="text-xs text-rose-800/60 mt-3">Ketuk untuk membuka</p>
+                    </div>
+                    <div class="backface-hidden rotate-y-180 bg-gradient-to-br from-pinkVibrant to-roseDeep text-white rounded-3xl p-6 flex flex-col items-center justify-center text-center h-full shadow-lg">
+                        <i data-lucide="heart" class="w-6 h-6 fill-white mb-3"></i>
+                        <p class="text-sm sm:text-base font-medium leading-relaxed">
+                            Terima kasih sudah memilih untuk terus saling menggenggam dan memperbaiki, bukan saling melepas.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- 6. SURPRISE FINALE                                                    -->
+    <!-- ===================================================================== -->
+    <section id="finale-section" class="relative z-10 py-16 sm:py-24 px-4 sm:px-6 max-w-4xl mx-auto text-center">
+        <div class="glass-card rounded-3xl p-8 sm:p-14 border border-pinkVibrant/40 relative overflow-hidden">
+            <span class="text-xs font-bold uppercase tracking-widest text-pinkVibrant">One More Thing</span>
+            <h2 class="font-serif text-3xl sm:text-5xl font-bold text-roseDeep mt-2 mb-4">
+                Siap Melangkah Lebih Jauh?
+            </h2>
+            <p class="text-sm sm:text-base text-rose-900/80 max-w-lg mx-auto mb-8 leading-relaxed">
+                Semoga setiap hari ke depan membawa lebih banyak tawa, pelukan hangat, mimpi yang terwujud, dan cinta yang tak pernah pudar.
+            </p>
+
+            <button onclick="triggerGrandFinale()"
+                class="px-8 py-4 rounded-full bg-gradient-to-r from-pinkVibrant via-roseDeep to-pinkVibrant text-white font-bold text-sm sm:text-base shadow-xl shadow-pinkVibrant/30 hover:scale-105 active:scale-95 transition-all duration-300 inline-flex items-center gap-2 cursor-pointer">
+                <i data-lucide="party-popper" class="w-5 h-5"></i>
+                <span>Rayakan Anniversary Kita!</span>
+            </button>
+
+            <div id="finaleMessageBox" class="hidden mt-8 p-6 rounded-2xl bg-pinkSoft/80 border border-pinkPastel text-roseDeep">
+                <p class="font-script text-3xl sm:text-4xl mb-2">I Love You, Today & Always! 💖</p>
+                <p class="text-xs sm:text-sm text-rose-900/80">
+                    Happy Anniversary sayang — sejak 25 April 2026 hingga selamanya.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="relative z-10 py-8 text-center text-xs sm:text-sm text-rose-900/65 px-4">
+        <p>Dibuat dengan penuh cinta • Sejak 25 April 2026 💕</p>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+
+        // Tanggal jadian permanen: 25 April 2026
+        const FIXED_START_DATE = "2026-04-25T00:00:00";
+
+        const LETTER_CONTENT = `Halo Sayangku,
+
+Selamat hari jadi untuk kita. Rasanya baru kemarin kita memulai cerita ini pada 25 April 2026, tapi setiap momen bersamamu sudah meninggalkan begitu banyak arti.
+
+Terima kasih karena sudah selalu ada, menemani di hari-hari biasa maupun saat keadaan sedang tidak mudah. Bersamamu, hal-hal kecil terasa istimewa dan masa depan terasa lebih cerah.
+
+Semoga kita terus saling menjaga, saling menguatkan, dan menuliskan lebih banyak cerita indah bersama. Aku sayang kamu, hari ini dan seterusnya.`;
+
+        const LYRIC_LINES = [
+            { time: 0, text: '"So I say a little prayer for you..."' },
+            { time: 18, text: '"And hope my dreams will take me there..."' },
+            { time: 36, text: '"Where the skies are blue to see you once again, my love..."' },
+            { time: 62, text: '"Over seas from coast to coast to find the place I love the most..."' },
+            { time: 92, text: '"My love... whenever I look around, it\'s you I see."' }
+        ];
+
+        // =====================================================================
+        // LIVE RELATIONSHIP TIMER
+        // =====================================================================
+        function updateRelationshipTimer() {
+            const start = new Date(FIXED_START_DATE).getTime();
+            const now = Date.now();
+            const diff = Math.max(0, now - start);
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+            const minutes = Math.floor((diff / (1000 * 60)) % 60);
+            const seconds = Math.floor((diff / 1000) % 60);
+
+            document.getElementById('timerDays').textContent = days.toLocaleString('id-ID');
+            document.getElementById('timerHours').textContent = String(hours).padStart(2, '0');
+            document.getElementById('timerMinutes').textContent = String(minutes).padStart(2, '0');
+            document.getElementById('timerSeconds').textContent = String(seconds).padStart(2, '0');
+        }
+        updateRelationshipTimer();
+        setInterval(updateRelationshipTimer, 1000);
+
+        // =====================================================================
+        // TOAST HELPER
+        // =====================================================================
+        let toastTimeout;
+        function showToast(message) {
+            const toast = document.getElementById('toastNotification');
+            document.getElementById('toastMessage').textContent = message;
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 3000);
+        }
+
+        // =====================================================================
+        // MUSIC PLAYER: MY LOVE - WESTLIFE (MP3 + SYNTH FALLBACK)
+        // =====================================================================
+        const audioEl = document.getElementById('myLoveAudio');
+        let isMusicPlaying = false;
+        let useSynthFallback = false;
+        let audioCtx = null;
+        let synthTimer = null;
+        let synthElapsed = 0;
+        const SYNTH_DURATION = 232; // 3:52
+
+        // Melodi "My Love" (freq Hz, durasi detik)
+        const MY_LOVE_MELODY = [
+            [392.00, 0.45], [440.00, 0.45], [523.25, 0.9], [659.25, 0.9],
+            [587.33, 0.45], [523.25, 0.45], [440.00, 1.2], [0, 0.3],
+            [392.00, 0.45], [440.00, 0.45], [523.25, 0.9], [659.25, 0.6],
+            [783.99, 0.9], [659.25, 0.6], [587.33, 1.3], [0, 0.4],
+            [659.25, 0.5], [698.46, 0.5], [783.99, 0.9], [659.25, 0.5],
+            [587.33, 0.5], [523.25, 1.2], [440.00, 0.5], [523.25, 1.3],
+            [0, 0.5]
+        ];
+        let melodyStep = 0;
+
+        function formatTime(sec) {
+            const safeSec = Math.max(0, Math.floor(sec || 0));
+            const m = Math.floor(safeSec / 60);
+            const s = safeSec % 60;
+            return `${m}:${String(s).padStart(2, '0')}`;
+        }
+
+        function updateLyricForTime(currentSec) {
+            let active = LYRIC_LINES[0].text;
+            for (const line of LYRIC_LINES) {
+                if (currentSec >= line.time) {
+                    active = line.text;
+                }
+            }
+            document.getElementById('activeLyricDisplay').textContent = active;
+        }
+
+        function syncPlayerUI(playing) {
+            isMusicPlaying = playing;
+            document.getElementById('musicStatusText').textContent = playing ? 'Jeda Lagu' : 'Putar My Love';
+            document.getElementById('heroMusicBtnText').textContent = playing ? 'Jeda My Love' : 'Putar My Love';
+            document.getElementById('playerPlayLabel').textContent = playing ? 'Jeda Lagu' : 'Putar My Love';
+
+            const iconEl = document.getElementById('playerPlayIcon');
+            if (iconEl) {
+                iconEl.setAttribute('data-lucide', playing ? 'pause' : 'play');
+                lucide.createIcons();
+            }
+
+            const disc = document.getElementById('vinylDisc');
+            disc.style.animationPlayState = playing ? 'running' : 'paused';
+
+            const eq = document.getElementById('equalizerBox');
+            if (playing) {
+                eq.classList.remove('eq-paused');
+            } else {
+                eq.classList.add('eq-paused');
+            }
+        }
+
+        function initAudioContext() {
+            if (!audioCtx) {
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContextClass();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playSynthNote(freq, durationSec) {
+            if (!audioCtx || freq <= 0) return;
+            const now = audioCtx.currentTime;
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, now);
+
+            gain.gain.setValueAtTime(0.0001, now);
+            gain.gain.exponentialRampToValueAtTime(0.08, now + 0.06);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + Math.max(0.12, durationSec * 0.95));
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(now);
+            osc.stop(now + durationSec);
+        }
+
+        function startSynthFallback() {
+            useSynthFallback = true;
+            initAudioContext();
+            document.getElementById('audioSourceBadge').textContent = 'Mode: Melodi "My Love" (Synth)';
+            clearInterval(synthTimer);
+
+            const tickMs = 250;
+            let noteRemaining = 0;
+
+            synthTimer = setInterval(() => {
+                if (!isMusicPlaying) return;
+
+                synthElapsed += tickMs / 1000;
+                if (synthElapsed >= SYNTH_DURATION) {
+                    synthElapsed = 0;
+                }
+
+                noteRemaining -= tickMs / 1000;
+                if (noteRemaining <= 0) {
+                    const [freq, dur] = MY_LOVE_MELODY[melodyStep % MY_LOVE_MELODY.length];
+                    melodyStep++;
+                    playSynthNote(freq, dur);
+                    noteRemaining = dur;
+                }
+
+                const pct = (synthElapsed / SYNTH_DURATION) * 100;
+                document.getElementById('audioProgressBar').value = pct;
+                document.getElementById('currentTimeLabel').textContent = formatTime(synthElapsed);
+                document.getElementById('durationTimeLabel').textContent = formatTime(SYNTH_DURATION);
+                updateLyricForTime(synthElapsed);
+            }, tickMs);
+        }
+
+        function stopSynthFallback() {
+            clearInterval(synthTimer);
+        }
+
+        async function toggleRomanticMusic() {
+            if (isMusicPlaying) {
+                audioEl.pause();
+                stopSynthFallback();
+                syncPlayerUI(false);
+                showToast('Musik dijeda');
+                return;
+            }
+
+            if (useSynthFallback) {
+                initAudioContext();
+                startSynthFallback();
+                syncPlayerUI(true);
+                showToast('Memutar melodi My Love');
+                return;
+            }
+
+            try {
+                await audioEl.play();
+                syncPlayerUI(true);
+                document.getElementById('audioSourceBadge').textContent = 'Westlife - My Love (Internet Archive)';
+                showToast('Memutar My Love — Westlife');
+            } catch (err) {
+                startSynthFallback();
+                syncPlayerUI(true);
+                showToast('Memutar melodi My Love');
+            }
+        }
+
+        audioEl.addEventListener('timeupdate', () => {
+            if (useSynthFallback || !audioEl.duration) return;
+            const pct = (audioEl.currentTime / audioEl.duration) * 100;
+            document.getElementById('audioProgressBar').value = pct;
+            document.getElementById('currentTimeLabel').textContent = formatTime(audioEl.currentTime);
+            document.getElementById('durationTimeLabel').textContent = formatTime(audioEl.duration);
+            updateLyricForTime(audioEl.currentTime);
+        });
+
+        audioEl.addEventListener('error', () => {
+            if (isMusicPlaying && !useSynthFallback) {
+                startSynthFallback();
+            }
+        });
+
+        function seekMusicProgress(pctValue) {
+            const pct = parseFloat(pctValue) / 100;
+            if (useSynthFallback) {
+                synthElapsed = pct * SYNTH_DURATION;
+                document.getElementById('currentTimeLabel').textContent = formatTime(synthElapsed);
+                updateLyricForTime(synthElapsed);
+                return;
+            }
+            if (audioEl.duration) {
+                audioEl.currentTime = pct * audioEl.duration;
+            }
+        }
+
+        // =====================================================================
+        // SURPRISE JOURNEY & ENVELOPE TYPEWRITER
+        // =====================================================================
+        function startSurpriseJourney() {
+            if (!isMusicPlaying) {
+                toggleRomanticMusic();
+            }
+            launchConfettiBurst(65);
+            document.getElementById('timer-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        let isEnvelopeOpen = false;
+        let typewriterInterval = null;
+
+        function toggleEnvelope() {
+            const box = document.getElementById('envelopeBox');
+            const fullCard = document.getElementById('fullLetterCard');
+            const targetEl = document.getElementById('typewriterText');
+
+            isEnvelopeOpen = !isEnvelopeOpen;
+            if (isEnvelopeOpen) {
+                box.classList.add('open');
+                fullCard.classList.remove('hidden');
+                launchConfettiBurst(40);
+
+                clearInterval(typewriterInterval);
+                targetEl.textContent = '';
+                targetEl.classList.add('typing-cursor');
+
+                let idx = 0;
+                typewriterInterval = setInterval(() => {
+                    if (idx < LETTER_CONTENT.length) {
+                        targetEl.textContent += LETTER_CONTENT.charAt(idx);
+                        idx++;
+                    } else {
+                        clearInterval(typewriterInterval);
+                        targetEl.classList.remove('typing-cursor');
+                    }
+                }, 24);
+            } else {
+                box.classList.remove('open');
+                fullCard.classList.add('hidden');
+                clearInterval(typewriterInterval);
+            }
+        }
+
+        function triggerGrandFinale() {
+            document.getElementById('finaleMessageBox').classList.remove('hidden');
+            launchConfettiBurst(130);
+            showToast('Happy Anniversary! 25 April 2026 💕');
+        }
+
+        // =====================================================================
+        // FLOATING HEARTS & CONFETTI CANVAS
+        // =====================================================================
+        const floatCanvas = document.getElementById('floatingCanvas');
+        const floatCtx = floatCanvas.getContext('2d');
+        const confettiCanvas = document.getElementById('confettiCanvas');
+        const confettiCtx = confettiCanvas.getContext('2d');
+
+        function resizeCanvases() {
+            floatCanvas.width = confettiCanvas.width = window.innerWidth;
+            floatCanvas.height = confettiCanvas.height = window.innerHeight;
+        }
+        resizeCanvases();
+        window.addEventListener('resize', resizeCanvases);
+
+        const hearts = Array.from({ length: 22 }, () => ({
+            x: Math.random() * window.innerWidth,
+            y: Math.random() * window.innerHeight,
+            size: 8 + Math.random() * 10,
+            speedY: 0.4 + Math.random() * 0.8,
+            driftX: (Math.random() - 0.5) * 0.6,
+            alpha: 0.15 + Math.random() * 0.25,
+            color: Math.random() > 0.5 ? '#FF6B9D' : '#FFB3C6'
+        }));
+
+        function drawHeart(ctx, x, y, size, color, alpha) {
+            ctx.save();
+            ctx.globalAlpha = alpha;
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            const topCurveHeight = size * 0.3;
+            ctx.moveTo(x, y + topCurveHeight);
+            ctx.bezierCurveTo(x, y, x - size / 2, y, x - size / 2, y + topCurveHeight);
+            ctx.bezierCurveTo(x - size / 2, y + (size + topCurveHeight) / 2, x, y + (size + topCurveHeight) / 1.2, x, y + size);
+            ctx.bezierCurveTo(x, y + (size + topCurveHeight) / 1.2, x + size / 2, y + (size + topCurveHeight) / 2, x + size / 2, y + topCurveHeight);
+            ctx.bezierCurveTo(x + size / 2, y, x, y, x, y + topCurveHeight);
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+        }
+
+        let confettiParticles = [];
+        function launchConfettiBurst(count = 70) {
+            const palette = ['#FF6B9D', '#E11D48', '#FFB3C6', '#F43F5E', '#FDA4AF', '#FDE047'];
+            for (let i = 0; i < count; i++) {
+                confettiParticles.push({
+                    x: window.innerWidth / 2 + (Math.random() - 0.5) * 140,
+                    y: window.innerHeight * 0.45,
+                    vx: (Math.random() - 0.5) * 14,
+                    vy: -6 - Math.random() * 10,
+                    size: 5 + Math.random() * 6,
+                    color: palette[Math.floor(Math.random() * palette.length)],
+                    rotation: Math.random() * Math.PI * 2,
+                    vRot: (Math.random() - 0.5) * 0.25,
+                    life: 1
+                });
+            }
+        }
+
+        function animateCanvases() {
+            floatCtx.clearRect(0, 0, floatCanvas.width, floatCanvas.height);
+            for (const h of hearts) {
+                h.y -= h.speedY;
+                h.x += h.driftX;
+                if (h.y < -30) {
+                    h.y = floatCanvas.height + 20;
+                    h.x = Math.random() * floatCanvas.width;
+                }
+                drawHeart(floatCtx, h.x, h.y, h.size, h.color, h.alpha);
+            }
+
+            confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+            confettiParticles = confettiParticles.filter(p => p.life > 0.02);
+            for (const p of confettiParticles) {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.35;
+                p.vx *= 0.99;
+                p.rotation += p.vRot;
+                p.life -= 0.012;
+
+                confettiCtx.save();
+                confettiCtx.globalAlpha = Math.max(0, p.life);
+                confettiCtx.translate(p.x, p.y);
+                confettiCtx.rotate(p.rotation);
+                confettiCtx.fillStyle = p.color;
+                confettiCtx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.65);
+                confettiCtx.restore();
+            }
+
+            requestAnimationFrame(animateCanvases);
+        }
+        animateCanvases();
+    </script>
+</body>
+</html>
